@@ -1,8 +1,6 @@
-# AdaptiveLLM — Clean MVP
+# AdaptiveLLM 
 
 当前图示 Full 主模型的独立代码包。只保留训练、验证、测试所需代码，不包含对比模型、消融变体、数据集、实验结果或预训练权重。
-
-AI 编码代理开始工作前请阅读 [AGENT.md](AGENT.md)；`AGENTS.md` 为对应的入口文件。
 
 ## 目录
 
@@ -42,7 +40,7 @@ Python 3.10+。按本机 CPU/CUDA 环境准备 PyTorch，然后安装运行依�
 python -m pip install -r requirements.txt
 ```
 
-运行依赖仅五项：PyTorch、Transformers、NumPy、pandas、scikit-learn。实际验证环境见 `verification.json`，版本范围未穷举组合测试。
+运行依赖仅五项：PyTorch、Transformers、NumPy、pandas、scikit-learn。实际验证环境见 `verification.json`。
 
 准备本地 GPT-2 目录，包含 `config.json` 和匹配权重。默认 6 层、768 维；不自动下载，不需要 tokenizer 文件。
 
@@ -53,8 +51,6 @@ CSV 包含 `date` 或 `timestamp`，以及配置中的数值字段。`target` �
 PVOD 示例采用六个实测辅助变量与功率目标，要求预先将原始 MW 功率转换为 kW，并准备 UTC+8 时间戳。代码不猜测或自动换算单位、时区。
 
 默认参数：15 min 数据、96→96、50%/25%/25%、batch 16、seed 4213、最多 20 epochs、patience 3、FP32、Adam、Huber 与 Prompt 多样性正则。完整可配置项见 `configuration.py`。
-
-只支持 Full：目标归一化 → 周期—残差分解 → 周期 LSTM / 残差重编程与 Prompt V2 → 冻结 GPT-2 → 门控融合 → 协变量 TimesBlock 与预测解码器 → 反归一化。没有消融开关、AMP 路径或其他骨干选择。
 
 ## 检查、训练与测试
 
@@ -80,28 +76,9 @@ python run.py --config configs/pvod.json --data /path/to/station.csv --llm-path 
 - nMAE = MAE / 真实值极差；NMSE = MSE / 极差²；nRMSE = √NMSE。真实值极差接近零时明确报错，不返回零误差。
 - 保留夜间零值与负预测，不裁剪或过滤。
 
-每个分区只读取一次完整 CSV；移除了未消费的额外预测输入。模型的外部 `forward(x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None)` 仍保留，`x_dec` 与 `mask` 不参与 Full 计算。
-
 ## 输出
 
 `config.json`、`runtime.json` 保存生效参数、设备、数据与 GPT-2 配置指纹；`history.json` 与 `best.pt` 保存损失和验证最优权重。`prediction.npy`、`truth.npy` 保存全部窗口，形状为 `[N,pred_len,1]`；`primary_window_indices.npy`、`metrics.json` 分别记录主评分索引和两套指标；成功结束时生成 `COMPLETE.json`。
-
-## 测试与代码风格
-
-普通离线测试在临时目录生成小型随机 GPT-2 和合成 CSV：
-
-```bash
-python -B -m unittest discover -s tests -v
-```
-
-默认 8 项功能测试运行，1 项旧版本对照测试在未指定来源时跳过。要执行同权重回归，在 PowerShell 中指定未经修改的旧 MVP：
-
-```powershell
-$env:ADAPTIVELLM_LEGACY_ROOT = (Resolve-Path ../code_mvp_20261019).Path
-python -B -m unittest discover -s tests -v
-```
-
-回归覆盖 state_dict 严格加载、前向输出、Prompt 正则、梯度、三套分区/标签长度配置、窗口边界、标准化与反标准化、指标一致性。数值容差记录在测试及 `verification.json` 中，不要求跨进程浮点逐位相等。
 
 开发检查：
 
@@ -112,9 +89,3 @@ ruff format --check .
 ```
 
 文件和函数统一 snake_case，类使用 PascalCase。保留 `LLM_encoder`、`tokenConv` 等历史模块属性名以兼容权重键；`from models import Model` 作为 `AdaptiveLLM` 的别名继续可用。
-
-移除曾被创建后立即覆盖的旧注意力层，改变了随机数消耗顺序，因此相同 seed 的全新训练初始化不再与旧版逐位一致；已有 Full 权重的键名和计算结构保持兼容。本轮没有启动真实数据训练。
-
-## 来源与许可
-
-本包来自上一版 MVP 的独立精简副本。原工程、旧代码包和论文结果均未修改。发布前请按上游项目许可补充适用的 LICENSE 与署名；本包不推定上游授权类型。
