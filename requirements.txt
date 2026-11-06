@@ -1,0 +1,6 @@
+# Install the appropriate CPU/CUDA PyTorch wheel for your machine first.
+torch>=2.6,<3
+transformers>=4.45,<5
+numpy>=1.24,<3
+pandas>=1.5,<3
+scikit-learn>=1.2,<2

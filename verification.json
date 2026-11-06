@@ -1,0 +1,73 @@
+{
+  "created": "2026-10-19T11:39:33.256052+00:00",
+  "purpose": "FULL_ONLY_CLEAN_MVP",
+  "parent_package": "code_mvp_20261019",
+  "retained_models": [
+    "AdaptiveLLM Full"
+  ],
+  "original_package_unchanged": true,
+  "original_manifest_verified": true,
+  "model_byte_identical": false,
+  "real_training_started": false,
+  "tests": {
+    "standalone_passed": 8,
+    "optional_legacy_passed": 1,
+    "total_passed": 9,
+    "failed": 0,
+    "scope": "CPU, temporary tiny GPT-2 and synthetic data only"
+  },
+  "compatibility": {
+    "state_dict": "strict load; identical key sets",
+    "forward": {
+      "rtol": 1e-05,
+      "atol": 1e-06
+    },
+    "prompt_regularizer": {
+      "rtol": 1e-05,
+      "atol": 1e-07
+    },
+    "gradients": {
+      "rtol": 1e-05,
+      "atol": 1e-07
+    },
+    "dataset_values": {
+      "rtol": 1e-12,
+      "atol": 1e-12
+    },
+    "dataset_cases": 3,
+    "metric_values": "exact equality for regression fixture",
+    "fresh_seed_initialization": "Changed due to removal of discarded attention initialization"
+  },
+  "static_checks": {
+    "syntax": "PASS",
+    "local_imports": "PASS",
+    "snake_case_modules": "PASS",
+    "ruff": "PASS",
+    "formatting": "PASS",
+    "absolute_path_unit_test": "PASS",
+    "no_data_results_weights_or_secrets": "PASS",
+    "cli_help": "PASS"
+  },
+  "code_statistics": {
+    "before": {
+      "files": 18,
+      "bytes": 100843,
+      "statements": 1582
+    },
+    "after": {
+      "files": 18,
+      "bytes": 51917,
+      "statements": 801
+    },
+    "bytes_reduction_percent": 48.52,
+    "ast_statements_reduction_percent": 49.37
+  },
+  "environment": {
+    "python": "3.10.19",
+    "torch": "2.10.0+cu128",
+    "transformers": "4.57.6",
+    "numpy": "1.26.4",
+    "pandas": "2.1.4",
+    "scikit-learn": "1.7.2"
+  }
+}
